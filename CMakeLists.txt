@@ -51,10 +51,9 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
 )
-find_package(Boost REQUIRED COMPONENTS system filesystem thread)
+find_package(Boost REQUIRED COMPONENTS filesystem thread)
 
 include_directories(
-    SYSTEM
     ${Boost_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
