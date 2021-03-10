@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
-
-project(filter_node )
-
+project(filter_node)
+if (NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif ("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
+  set(CMAKE_CXX_STANDARD 11)
+endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOMOC ON) # For meta object compiler
