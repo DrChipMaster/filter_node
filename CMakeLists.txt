@@ -7,12 +7,13 @@ project(filter_node)
 #  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
 #  set(CMAKE_CXX_STANDARD 11)
 #endif()
-set(CMAKE_NO_SYSTEM_FROM_IMPORTED ON)‍
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOMOC ON) # For meta object compiler
 set(CMAKE_AUTORCC ON) # Resource files
-set(CMAKE_AUTOUIC ON) # UI files
+set(CMAKE_NO_SYSTEM_FROM_IMPORTED ON) # UI files
+
+#set(CMAKE_NO_SYSTEM_FROM_IMPORTED ON)‍
 
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
 # Check https://doc.qt.io/qt/deployment-android.html for more information.
