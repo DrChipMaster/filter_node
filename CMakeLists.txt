@@ -29,21 +29,21 @@ set(CMAKE_AUTOUIC ON) # UI files
 #find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(PCL 1.8 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
-  dynamic-reconfigure
-  geometry-msgs
-  message-filters
+  dynamic_reconfigure
+  geometry_msgs
+  message_filters
   nodelet
-  nodelet-topic-tools
-  pcl-conversions
-  pcl-msgs
+  nodelet_topic_tools
+  pcl_conversions
+  pcl_msgs
   pluginlib
   rosbag
   rosconsole
   roscpp
   roslib
-  sensor-msgs
-  std-msgs
-  message-generation
+  sensor_msgs
+  std_msgs
+  message_generation
 )
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -58,21 +58,21 @@ include_directories(
 
 catkin_package(
   CATKIN_DEPENDS
-    dynamic-reconfigure
-    geometry-msgs
-    message-filters
+    dynamic_reconfigure
+    geometry_msgs
+    message_filters
     nodelet
-    nodelet-topic-tools
-    pcl-conversions
-    pcl-msgs
+    nodelet_topic_tools
+    pcl_conversions
+    pcl_msgs
     rosbag
     roscpp
-    sensor-msgs
-    std-msgs
+    sensor_msgs
+    std_msgs
   DEPENDS
     Boost
     PCL
-    message-runtime
+    message_runtime
 )
 
 
