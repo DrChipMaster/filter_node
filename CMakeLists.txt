@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(filters_node )
+project(filter_node )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -22,8 +22,6 @@ set(CMAKE_AUTOUIC ON) # UI files
 #endif()
 #find_package(QT NAMES Qt5 COMPONENTS Widgets REQUIRED)
 #find_package(Qt5 COMPONENTS Widgets REQUIRED)
-
-find_package(VTK REQUIRED)
 find_package(PCL 1.8 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
@@ -78,6 +76,6 @@ add_definitions(${PCL_DEFINITIONS})
 
 set(project_SOURCES main.cpp filters.cpp filters.h rosthread.cpp rosthread.h)
 
-add_executable(filters_node ${project_SOURCES})
+add_executable(filter_node ${project_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
