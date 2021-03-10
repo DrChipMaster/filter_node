@@ -61,8 +61,8 @@ catkin_package(
     message_filters
     nodelet
     nodelet_topic_tools
-    pcl_conversions
-    pcl_msgs
+    pcl-conversions
+    pcl-msgs
     rosbag
     roscpp
     sensor_msgs
