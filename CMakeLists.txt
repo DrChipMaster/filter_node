@@ -8,6 +8,7 @@ project(filter_node)
 #  set(CMAKE_CXX_STANDARD 11)
 #endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_${lang}_COMPILE_OPTIONS_SYSROOT "--sysroot=")
 
 set(CMAKE_AUTOMOC ON) # For meta object compiler
 set(CMAKE_AUTORCC ON) # Resource files
