@@ -42,7 +42,7 @@ find_package(catkin REQUIRED COMPONENTS
   roslib
   sensor_msgs
   std_msgs
-  message_generation
+  message-generation
 )
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)
 include_directories(include ${catkin_INCLUDE_DIRS})
