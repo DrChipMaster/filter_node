@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
-
-project(filters_node )
-
+project(filter_node)
+if (NOT "${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif ("${CMAKE_CXX_STANDARD_COMPUTED_DEFAULT}" STREQUAL "98")
+  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
+  set(CMAKE_CXX_STANDARD 11)
+endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOMOC ON) # For meta object compiler
@@ -22,25 +27,23 @@ set(CMAKE_AUTOUIC ON) # UI files
 #endif()
 #find_package(QT NAMES Qt5 COMPONENTS Widgets REQUIRED)
 #find_package(Qt5 COMPONENTS Widgets REQUIRED)
-
-find_package(VTK REQUIRED)
 find_package(PCL 1.8 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
-  dynamic_reconfigure
-  geometry_msgs
-  message_filters
+  dynamic-reconfigure
+  geometry-msgs
+  message-filters
   nodelet
-  nodelet_topic_tools
-  pcl_conversions
-  pcl_msgs
+  nodelet-topic-tools
+  pcl-conversions
+  pcl-msgs
   pluginlib
   rosbag
   rosconsole
   roscpp
   roslib
-  sensor_msgs
-  std_msgs
-  message_generation
+  sensor-msgs
+  std-msgs
+  message-generation
 )
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -55,21 +58,21 @@ include_directories(
 
 catkin_package(
   CATKIN_DEPENDS
-    dynamic_reconfigure
-    geometry_msgs
-    message_filters
+    dynamic-reconfigure
+    geometry-msgs
+    message-filters
     nodelet
-    nodelet_topic_tools
-    pcl_conversions
-    pcl_msgs
+    nodelet-topic-tools
+    pcl-conversions
+    pcl-msgs
     rosbag
     roscpp
-    sensor_msgs
-    std_msgs
+    sensor-msgs
+    std-msgs
   DEPENDS
     Boost
     PCL
-    message_runtime
+    message-runtime
 )
 
 
@@ -78,6 +81,15 @@ add_definitions(${PCL_DEFINITIONS})
 
 set(project_SOURCES main.cpp filters.cpp filters.h rosthread.cpp rosthread.h)
 
-add_executable(filters_node ${project_SOURCES})
+add_executable(filter_node ${project_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+install(TARGETS filter_node
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+install(TARGETS filter_node
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
