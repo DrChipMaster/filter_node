@@ -29,6 +29,7 @@ set(CMAKE_AUTOUIC ON) # UI files
 #find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(PCL 1.8 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
+  dynamic-reconfigure
   geometry-msgs
   message-filters
   nodelet
@@ -57,6 +58,7 @@ include_directories(
 
 catkin_package(
   CATKIN_DEPENDS
+    dynamic-reconfigure
     geometry-msgs
     message-filters
     nodelet
