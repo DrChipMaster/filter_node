@@ -60,7 +60,7 @@ catkin_package(
     geometry_msgs
     message_filters
     nodelet
-    nodelet_topic_tools
+    nodelet-topic-tools
     pcl-conversions
     pcl-msgs
     rosbag
