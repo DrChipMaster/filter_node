@@ -65,7 +65,7 @@ catkin_package(
     pcl-msgs
     rosbag
     roscpp
-    sensor_msgs
+    sensor-msgs
     std-msgs
   DEPENDS
     Boost
