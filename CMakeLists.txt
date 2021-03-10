@@ -79,3 +79,12 @@ set(project_SOURCES main.cpp filters.cpp filters.h rosthread.cpp rosthread.h)
 add_executable(filter_node ${project_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+install(TARGETS filter_node
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+install(TARGETS filter_node
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
