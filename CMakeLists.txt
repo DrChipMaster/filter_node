@@ -7,14 +7,14 @@ project(filter_node)
 #  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
 #  set(CMAKE_CXX_STANDARD 11)
 #endif()
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_${lang}_COMPILE_OPTIONS_SYSROOT "--sysroot=")
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOMOC ON) # For meta object compiler
 set(CMAKE_AUTORCC ON) # Resource files
 set(CMAKE_NO_SYSTEM_FROM_IMPORTED ON) # UI files
 set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES ON) # UI files
 set(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES ON) # UI files
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 
 #set(CMAKE_NO_SYSTEM_FROM_IMPORTED ON)‍
@@ -52,7 +52,6 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 find_package(Boost REQUIRED COMPONENTS system filesystem thread)
-include_directories(include ${catkin_INCLUDE_DIRS})
 
 include_directories(
     SYSTEM
@@ -90,3 +89,12 @@ set(project_SOURCES main.cpp filters.cpp filters.h rosthread.cpp rosthread.h)
 add_executable(filter_node ${project_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+install(TARGETS filter_node
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+install(TARGETS tfilter_node
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
