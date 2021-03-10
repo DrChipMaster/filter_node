@@ -7,6 +7,7 @@ project(filter_node)
 #  message(STATUS "Changing CXX_STANDARD from C++98 to C++11")
 #  set(CMAKE_CXX_STANDARD 11)
 #endif()
+set(CMAKE_NO_SYSTEM_FROM_IMPORTED ON)‍
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOMOC ON) # For meta object compiler
