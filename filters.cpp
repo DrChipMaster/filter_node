@@ -12,13 +12,14 @@
 
 Filters::Filters()
 {
-  pcl2_Header_seq=0;
-  filter_number = 1;
-  parameter1 = 0.1;
-  parameter2 = 0.1;
-  parameter3 = 0.1;
-  parameter4 = 0.1;
-  parameter5 = 0.1;
+    pcl2_Header_seq=0;
+    filter_number = 1;
+    parameter1 = 0.1;
+    parameter2 = 0.1;
+    parameter3 = 0.1;
+    parameter4 = 0.1;
+    parameter5 = 0.1;
+    use_multi = false;
 
 }
 
@@ -35,9 +36,9 @@ void Filters::do_sorfilter()
 {
     pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
     sor.setInputCloud (inputCloud);
-      sor.setMeanK (parameter1);
-      sor.setStddevMulThresh (parameter2);
-      sor.filter (*OutputCloud);
+    sor.setMeanK (parameter1);
+    sor.setStddevMulThresh (parameter2);
+    sor.filter (*OutputCloud);
 }
 
 void Filters::do_dorfilter(pcl::PointCloud<PointT>::Ptr newInput)
@@ -46,30 +47,43 @@ void Filters::do_dorfilter(pcl::PointCloud<PointT>::Ptr newInput)
 
     inliners.clear();
     kdtree.setInputCloud(newInput);
-    m_worker_thread1 = new boost::thread(&Filters::run_worker1, this);
-    m_worker_thread2 = new boost::thread(&Filters::run_worker2, this);
-    m_worker_thread3 = new boost::thread(&Filters::run_worker3, this);
-    m_worker_thread1->join();
-    m_worker_thread2->join();
-    m_worker_thread3->join();
 
+    if(use_multi == true)
+    {
+        thread_list.clear();
+        cout << "Running multithreading with "<< number_threads<<endl;
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list.push_back(new boost::thread(&Filters::run_worker, this,i));
+        }
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list[i]->join();
+        }
+
+    }
+    else {
+        for (auto &point : *newInput)
+        {
+            filter_point(point);
+        }
+    }
     OutputCloud->resize(inliners.size());
     int counter =0;
-     for(auto& point: *OutputCloud)
-     {
-         point = inliners[counter];
-         counter++;
-     }
+    for(auto& point: *OutputCloud)
+    {
+        point = inliners[counter];
+        counter++;
+    }
 }
 
 void Filters::do_rorfilter()
 {
     pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;
     outrem.setInputCloud(inputCloud);
-       outrem.setRadiusSearch(parameter1);
-       outrem.setMinNeighborsInRadius (parameter2);
-       //outrem.setKeepOrganized(true);
-       outrem.filter (*OutputCloud);
+    outrem.setRadiusSearch(parameter1);
+    outrem.setMinNeighborsInRadius (parameter2);
+    outrem.filter (*OutputCloud);
 
 }
 
@@ -112,55 +126,42 @@ void Filters::do_VoxDrorfilter()
 
 void Filters::do_GDRORfilter()
 {
-    vector<pcl::PointXYZ> inliners,outliners;
+    //vector<pcl::PointXYZ> inliners;
+    inliners.clear();
     kdtree.setInputCloud(inputCloud);
-      for(auto& point: *inputCloud)
-      {
-          if(point.z >0- parameter5)
-          {
-              float distance = sqrt(pow(point.x,2)+pow(point.y,2));
-              float search_radius;
-              //float anlge = atan2((double)point.y,(double)point.x);
-              //if(anlge <0)
-              //{
-                  //anlge = 2*M_PI + anlge;
-              //}
-              float anlge = 0.3;
 
-              if(distance<parameter1)
-              {
-                  search_radius = parameter1;
-              }else
-              {
-                  //float anlge = atan((double)point.y/(double)point.x);
+    if(use_multi)
+    {
+        thread_list.clear();
+        cout << "Running multithreading with "<< number_threads<<endl;
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list.push_back(new boost::thread(&Filters::run_worker, this,i));
+        }
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list[i]->join();
+        }
+    }
+    else
+    {
+        for(auto& point: *inputCloud)
+        {
+            if(point.z >0- parameter5)
+            {
+                filter_point(point);
+            }
 
+        }
+    }
 
-                  //anlge = anlge * 180.0 / M_PI;
-
-                  search_radius = parameter2 * (distance*anlge);
-              }
-              std::vector<int> pointIdxRadiusSearch;
-              std::vector<float> pointRadiusSquaredDistance;
-
-              int neighbors = kdtree.radiusSearch (point, search_radius, pointIdxRadiusSearch, pointRadiusSquaredDistance) ;
-              if(neighbors<parameter3)
-              {
-                  outliners.push_back(point);
-              }else
-              {
-                  inliners.push_back(point);
-              }
-          }
-
-
-      }
-      OutputCloud->resize(inliners.size());
-      int counter =0;
-       for(auto& point: *OutputCloud)
-       {
-           point = inliners[counter];
-           counter++;
-       }
+    OutputCloud->resize(inliners.size());
+    int counter =0;
+    for(auto& point: *OutputCloud)
+    {
+        point = inliners[counter];
+        counter++;
+    }
 
 }
 using namespace std::chrono;
@@ -178,7 +179,7 @@ void Filters::apply_filters()
     case 3:
         do_sorfilter();
         break;
-     case 4:
+    case 4:
         do_dorfilter(inputCloud);
         break;
     case 5:
@@ -199,38 +200,6 @@ void Filters::apply_filters()
 
 }
 
-void Filters::run_worker1()
-{
-    for(int i =0 ; i<= inputCloud->size()/3;i++)
-    {
-        pcl::PointXYZ point = (*inputCloud)[i];
-        filter_point(point);
-
-    }
-}
-
-void Filters::run_worker2()
-{
-
-    for(int i =inputCloud->size()/3; i<= (inputCloud->size()/3)*2;i++)
-    {
-        pcl::PointXYZ point = (*inputCloud)[i];
-        filter_point(point);
-
-    }
-}
-
-void Filters::run_worker3()
-{
-
-    for(int i =(inputCloud->size()/3)*2; i<= inputCloud->size();i++)
-    {
-        pcl::PointXYZ point = (*inputCloud)[i];
-        filter_point(point);
-
-    }
-}
-
 void Filters::filter_point(pcl::PointXYZ point)
 {
     float distance = sqrt(pow(point.x,2)+pow(point.y,2));
@@ -238,9 +207,9 @@ void Filters::filter_point(pcl::PointXYZ point)
     //float anlge = atan2((double)point.y,(double)point.x);
     //if(anlge <0)
     //{
-        //anlge = 2*M_PI + anlge;
+    //anlge = 2*M_PI + anlge;
     //}
-    float anlge = 0.3;
+    float anlge = parameter4;
 
     if(distance<parameter1)
     {
@@ -260,29 +229,113 @@ void Filters::filter_point(pcl::PointXYZ point)
     int neighbors = kdtree.radiusSearch (point, search_radius, pointIdxRadiusSearch, pointRadiusSquaredDistance) ;
     if(neighbors>=parameter3)
     {
-         mutex.lock();
+        mutex.lock();
 
         inliners.push_back(point);
         mutex.unlock();
+        //OutputCloud->push_back(point);
+
+        //}
+        //}
+    }
+}
+
+void Filters::filter_pointGDROR(pcl::PointXYZ point)
+{
+    if(point.z > parameter5)
+    {
+
+
+        float distance = sqrt(pow(point.x,2)+pow(point.y,2));
+        float search_radius;
+        //float anlge = atan2((double)point.y,(double)point.x);
+        //if(anlge <0)
+        //{
+        //anlge = 2*M_PI + anlge;
+        //}
+        float anlge = parameter4;
+
+        if(distance<parameter1)
+        {
+            search_radius = parameter1;
+        }else
+        {
+            //float anlge = atan((double)point.y/(double)point.x);
+
+
+            //anlge = anlge * 180.0 / M_PI;
+
+            search_radius = parameter2 * (distance*anlge);
+        }
+        std::vector<int> pointIdxRadiusSearch;
+        std::vector<float> pointRadiusSquaredDistance;
+
+        int neighbors = kdtree.radiusSearch (point, search_radius, pointIdxRadiusSearch, pointRadiusSquaredDistance) ;
+        if(neighbors>=parameter3)
+        {
+            mutex.lock();
+
+            inliners.push_back(point);
+            mutex.unlock();
             //OutputCloud->push_back(point);
 
-    //}
-//}
+            //}
+            //}
+        }
     }
 }
 
 void Filters::update_filterSettings(const alfa_dvc::FilterSettings &msg)
 {
     cout<<"updating filter Settings"<<endl;
+    mutex.lock();
     filter_number = msg.filterNumber;
     parameter1 = msg.parameter1;
     parameter2 = msg.parameter2;
     parameter3 = msg.parameter3;
     parameter4 = msg.parameter4;
     parameter5 = msg.parameter5;
-
+    mutex.unlock();
+    if (thread_list.size()>0)
+    {
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list[i]->join();
+        }
+    }
+    //thread_list.clear();
+    mutex.lock();
+    if(filter_number == 4)
+    {
+        if (parameter5 > 0)
+        {
+            cout << "Enabling Multihreading"<<endl;
+            use_multi = true;
+            number_threads = int(parameter5);
+        }
+        else
+        {
+            cout << "Disabling Multihreading"<<endl;
+            use_multi = false;
+        }
+    }
+        mutex.unlock();
 
 }
+
+void Filters::run_worker(int thread_number)
+{
+
+    for(int i =(inputCloud->size()/number_threads)*thread_number; i<= (inputCloud->size()/number_threads)*(thread_number+1);i++)
+    {
+        pcl::PointXYZ point = (*inputCloud)[i];
+        if (filter_number == 4)
+        filter_point(point);
+        else filter_pointGDROR(point);
+
+    }
+}
+
 
 void Filters::emit_frametime()
 {

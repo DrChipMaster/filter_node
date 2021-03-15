@@ -47,22 +47,25 @@ private:
     float parameter3;
     float parameter4;
     float parameter5;
+    bool use_multi;
+
     boost::thread *m_worker_thread1;
     boost::thread *m_worker_thread2;
     boost::thread *m_worker_thread3;
-
+    int number_threads;
     boost::mutex mutex;
     int lastFilterNumber;
     int totalTime;
     int frameInteration;
     int frameTime;
     vector<pcl::PointXYZ> inliners;
+    vector< boost::thread *> thread_list;
+
     pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
     void run();
-    void run_worker1();
-    void run_worker2();
-    void run_worker3();
+    void run_worker(int thread_number);
     void filter_point(pcl::PointXYZ point);
+    void filter_pointGDROR(pcl::PointXYZ point);
      void cloud_cb (const  sensor_msgs::PointCloud2ConstPtr& cloud);
      void emit_frametime();
      void emit_exitpointcloud();
