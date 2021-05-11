@@ -19,7 +19,7 @@
 #include <sensor_msgs/PointCloud2.h>
 
 
-typedef pcl::PointXYZ PointT;
+typedef pcl::PointXYZI PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 
 using namespace std;
@@ -35,6 +35,8 @@ public:
     void do_fcsorfilter();
     void do_VoxDrorfilter();
     void do_GDRORfilter();
+    void do_LIORfilter();
+    void do_DLIORfilter();
     void apply_filters();
     void update_filterSettings(const alfa_dvc::FilterSettings &msg);
     pcl::PointCloud<PointT>::Ptr inputCloud;
@@ -58,14 +60,17 @@ private:
     int totalTime;
     int frameInteration;
     int frameTime;
-    vector<pcl::PointXYZ> inliners;
+    vector<pcl::PointXYZI> inliners;
     vector< boost::thread *> thread_list;
 
-    pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+    pcl::KdTreeFLANN<pcl::PointXYZI> kdtree;
     void run();
     void run_worker(int thread_number);
-    void filter_point(pcl::PointXYZ point);
-    void filter_pointGDROR(pcl::PointXYZ point);
+    void run_lior_worker(int thread_number);
+    void run_dlior_worker(int thread_number);
+    void filter_point(pcl::PointXYZI point);
+    void filter_pointGDROR(pcl::PointXYZI point);
+    void filter_pointROR(pcl::PointXYZI point);
      void cloud_cb (const  sensor_msgs::PointCloud2ConstPtr& cloud);
      void emit_frametime();
      void emit_exitpointcloud();

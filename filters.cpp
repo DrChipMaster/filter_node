@@ -10,6 +10,9 @@
 #include <chrono>
 
 
+#define LIOR_CONST  0.066
+
+
 Filters::Filters()
 {
     pcl2_Header_seq=0;
@@ -25,7 +28,7 @@ Filters::Filters()
 
 void Filters::do_voxelfilter()
 {
-    pcl::VoxelGrid<pcl::PointXYZ> sor;
+    pcl::VoxelGrid<pcl::PointXYZI> sor;
     sor.setInputCloud (inputCloud);
     sor.setLeafSize (parameter1,parameter2,parameter3);
     sor.filter (*OutputCloud);
@@ -34,7 +37,7 @@ void Filters::do_voxelfilter()
 
 void Filters::do_sorfilter()
 {
-    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZI> sor;
     sor.setInputCloud (inputCloud);
     sor.setMeanK (parameter1);
     sor.setStddevMulThresh (parameter2);
@@ -43,7 +46,7 @@ void Filters::do_sorfilter()
 
 void Filters::do_dorfilter(pcl::PointCloud<PointT>::Ptr newInput)
 {
-    vector<pcl::PointXYZRGBA> outliners;
+    vector<pcl::PointXYZI> outliners;
 
     inliners.clear();
     kdtree.setInputCloud(newInput);
@@ -79,7 +82,7 @@ void Filters::do_dorfilter(pcl::PointCloud<PointT>::Ptr newInput)
 
 void Filters::do_rorfilter()
 {
-    pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;
+    pcl::RadiusOutlierRemoval<pcl::PointXYZI> outrem;
     outrem.setInputCloud(inputCloud);
     outrem.setRadiusSearch(parameter1);
     outrem.setMinNeighborsInRadius (parameter2);
@@ -89,18 +92,18 @@ void Filters::do_rorfilter()
 
 void Filters::do_fcsorfilter()
 {
-    pcl::PointXYZ minPt, maxPt;
+    pcl::PointXYZI minPt, maxPt;
     pcl::getMinMax3D (*inputCloud, minPt, maxPt);
     double NumberClusters = parameter1;
     double  ClusterLength = abs(maxPt.x -minPt.x)/NumberClusters;
     double ClusterWidth = abs(maxPt.y - minPt.y)/NumberClusters;
     double ClusterHeight = abs(maxPt.z - minPt.z)/NumberClusters;
-    pcl::VoxelGrid<pcl::PointXYZ> voxel;
+    pcl::VoxelGrid<pcl::PointXYZI> voxel;
     voxel.setInputCloud (inputCloud);
     voxel.setLeafSize (ClusterLength,ClusterWidth, ClusterHeight);
-    pcl::PointCloud<PointT>::Ptr betweenCloud( new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<PointT>::Ptr betweenCloud( new pcl::PointCloud<pcl::PointXYZI>);
     voxel.filter (*betweenCloud);
-    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZI> sor;
     sor.setInputCloud (betweenCloud);
     sor.setMeanK (parameter2);
     sor.setStddevMulThresh (parameter3);
@@ -109,16 +112,16 @@ void Filters::do_fcsorfilter()
 
 void Filters::do_VoxDrorfilter()
 {
-    pcl::PointXYZ minPt, maxPt;
+    pcl::PointXYZI minPt, maxPt;
     pcl::getMinMax3D (*inputCloud, minPt, maxPt);
     double NumberClusters = parameter5;
     double  ClusterLength = abs(maxPt.x -minPt.x)/NumberClusters;
     double ClusterWidth = abs(maxPt.y - minPt.y)/NumberClusters;
     double ClusterHeight = abs(maxPt.z - minPt.z)/NumberClusters;
-    pcl::VoxelGrid<pcl::PointXYZ> voxel;
+    pcl::VoxelGrid<pcl::PointXYZI> voxel;
     voxel.setInputCloud (inputCloud);
     voxel.setLeafSize (ClusterLength,ClusterWidth, ClusterHeight);
-    pcl::PointCloud<PointT>::Ptr betweenCloud( new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<PointT>::Ptr betweenCloud( new pcl::PointCloud<pcl::PointXYZI>);
     voxel.filter (*betweenCloud);
     do_dorfilter(betweenCloud);
 
@@ -126,7 +129,7 @@ void Filters::do_VoxDrorfilter()
 
 void Filters::do_GDRORfilter()
 {
-    //vector<pcl::PointXYZ> inliners;
+    //vector<pcl::PointXYZI> inliners;
     inliners.clear();
     kdtree.setInputCloud(inputCloud);
 
@@ -164,6 +167,100 @@ void Filters::do_GDRORfilter()
     }
 
 }
+
+
+void Filters::do_LIORfilter()
+{
+    inliners.clear();
+    kdtree.setInputCloud(inputCloud);
+    number_threads = parameter4;
+    if (use_multi && number_threads >1)
+    {
+        thread_list.clear();
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list.push_back(new boost::thread(&Filters::run_lior_worker, this,i));
+        }
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list[i]->join();
+         }
+    }
+    else {
+        for (auto &point : *inputCloud)
+        {
+            double intensity_trehshold=parameter4;
+            float distance = sqrt(pow(point.x, 2) + pow(point.y, 2)+pow(point.z, 2));
+            if(point._PointXYZI::intensity*distance*LIOR_CONST > intensity_trehshold)
+            {
+                mutex.lock();
+                inliners.push_back(point);
+                mutex.unlock();
+            }
+            else
+            {
+                filter_pointROR(point);
+            }
+        }
+
+    }
+
+    OutputCloud->resize(inliners.size());
+    int counter = 0;
+    for (auto &point : *OutputCloud)
+    {
+        point = inliners[counter];
+        counter++;
+    }
+
+}
+
+void Filters::do_DLIORfilter()
+{
+    inliners.clear();
+    kdtree.setInputCloud(inputCloud);
+    number_threads = parameter5;
+    if (use_multi && number_threads >1)
+    {
+        thread_list.clear();
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list.push_back(new boost::thread(&Filters::run_dlior_worker, this,i));
+        }
+        for (int i =0;i <= number_threads;i++)
+        {
+            thread_list[i]->join();
+         }
+    }
+    else {
+        for (auto &point : *inputCloud)
+        {
+            double intensity_trehshold=parameter4;
+            float distance = sqrt(pow(point.x, 2) + pow(point.y, 2));
+            if(point._PointXYZI::intensity*distance*LIOR_CONST > intensity_trehshold)
+            {
+                mutex.lock();
+                inliners.push_back(point);
+                mutex.unlock();
+            }
+            else
+            {
+                filter_point(point);
+            }
+        }
+
+    }
+
+    OutputCloud->resize(inliners.size());
+    int counter = 0;
+    for (auto &point : *OutputCloud)
+    {
+        point = inliners[counter];
+        counter++;
+    }
+
+}
+
 using namespace std::chrono;
 void Filters::apply_filters()
 {
@@ -191,6 +288,12 @@ void Filters::apply_filters()
     case 7:
         do_GDRORfilter();
         break;
+    case 8:
+        do_LIORfilter();
+        break;
+    case 9:
+        do_DLIORfilter();
+        break;
     }
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
@@ -200,7 +303,23 @@ void Filters::apply_filters()
 
 }
 
-void Filters::filter_point(pcl::PointXYZ point)
+
+
+void Filters::filter_pointROR(pcl::PointXYZI point)
+{
+    std::vector<int> pointIdxRadiusSearch;
+    std::vector<float> pointRadiusSquaredDistance;
+
+    int neighbors = kdtree.radiusSearch(point,parameter1, pointIdxRadiusSearch, pointRadiusSquaredDistance);
+    if (neighbors >parameter3)
+    {
+        inliners.push_back(point);
+    }
+}
+
+
+
+void Filters::filter_point(pcl::PointXYZI point)
 {
     float distance = sqrt(pow(point.x,2)+pow(point.y,2));
     float search_radius;
@@ -240,7 +359,7 @@ void Filters::filter_point(pcl::PointXYZ point)
     }
 }
 
-void Filters::filter_pointGDROR(pcl::PointXYZ point)
+void Filters::filter_pointGDROR(pcl::PointXYZI point)
 {
     if(point.z > parameter5)
     {
@@ -328,12 +447,58 @@ void Filters::run_worker(int thread_number)
 
     for(int i =(inputCloud->size()/number_threads)*thread_number; i<= (inputCloud->size()/number_threads)*(thread_number+1);i++)
     {
-        pcl::PointXYZ point = (*inputCloud)[i];
+        pcl::PointXYZI point = (*inputCloud)[i];
         if (filter_number == 4)
         filter_point(point);
         else filter_pointGDROR(point);
 
     }
+}
+
+
+
+
+void Filters::run_lior_worker(int thread_number)
+{
+    for(int i =(inputCloud->size()/number_threads)*thread_number; i<= (inputCloud->size()/number_threads)*(thread_number+1);i++)
+    {
+        pcl::PointXYZI point = (*inputCloud)[i];
+        double intensity_trehshold=parameter2;
+        float distance = sqrt(pow(point.x, 2) + pow(point.y, 2)+pow(point.z, 2));
+        if(point._PointXYZI::intensity*distance*LIOR_CONST > intensity_trehshold)
+        {
+            mutex.lock();
+            inliners.push_back(point);
+            mutex.unlock();
+        }
+        else
+        {
+            filter_pointROR(point);
+        }
+    }
+}
+
+
+
+void Filters::run_dlior_worker(int thread_number)
+{
+    for(int i =(inputCloud->size()/number_threads)*thread_number; i<= (inputCloud->size()/number_threads)*(thread_number+1);i++)
+    {
+        pcl::PointXYZI point = (*inputCloud)[i];
+        double intensity_trehshold=parameter4;
+        float distance = sqrt(pow(point.x, 2) + pow(point.y, 2)+pow(point.z, 2));
+        if(point._PointXYZI::intensity*distance*LIOR_CONST > intensity_trehshold)
+        {
+            mutex.lock();
+            inliners.push_back(point);
+            mutex.unlock();
+        }
+        else
+        {
+            filter_point(point);
+        }
+    }
+
 }
 
 
