@@ -5,7 +5,6 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/filter.h>
-#include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/common/common.h>
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/filters/passthrough.h>
@@ -20,7 +19,7 @@
 #include <sensor_msgs/PointCloud2.h>
 
 
-typedef pcl::PointXYZ PointT;
+typedef pcl::PointXYZI PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 
 using namespace std;
@@ -36,6 +35,8 @@ public:
     void do_fcsorfilter();
     void do_VoxDrorfilter();
     void do_GDRORfilter();
+    void do_LIORfilter();
+    void do_DLIORfilter();
     void apply_filters();
     void update_filterSettings(const alfa_dvc::FilterSettings &msg);
     pcl::PointCloud<PointT>::Ptr inputCloud;
@@ -48,22 +49,28 @@ private:
     float parameter3;
     float parameter4;
     float parameter5;
+    bool use_multi;
+
     boost::thread *m_worker_thread1;
     boost::thread *m_worker_thread2;
     boost::thread *m_worker_thread3;
-
+    int number_threads;
     boost::mutex mutex;
     int lastFilterNumber;
     int totalTime;
     int frameInteration;
     int frameTime;
-    vector<pcl::PointXYZ> inliners;
-    pcl::KdTreeFLANN<pcl::PointXYZ> kdtree;
+    vector<pcl::PointXYZI> inliners;
+    vector< boost::thread *> thread_list;
+
+    pcl::KdTreeFLANN<pcl::PointXYZI> kdtree;
     void run();
-    void run_worker1();
-    void run_worker2();
-    void run_worker3();
-    void filter_point(pcl::PointXYZ point);
+    void run_worker(int thread_number);
+    void run_lior_worker(int thread_number);
+    void run_dlior_worker(int thread_number);
+    void filter_point(pcl::PointXYZI point);
+    void filter_pointGDROR(pcl::PointXYZI point);
+    void filter_pointROR(pcl::PointXYZI point);
      void cloud_cb (const  sensor_msgs::PointCloud2ConstPtr& cloud);
      void emit_frametime();
      void emit_exitpointcloud();

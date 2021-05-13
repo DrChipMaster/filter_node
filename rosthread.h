@@ -11,7 +11,6 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/filter.h>
-#include <pcl/visualization/pcl_visualizer.h>
 #include "filters.h"
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/filters/passthrough.h>
