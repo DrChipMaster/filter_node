@@ -10,7 +10,11 @@
 #include <chrono>
 
 
+
 #define LIOR_CONST  0.066
+
+
+
 
 
 Filters::Filters()
@@ -22,7 +26,7 @@ Filters::Filters()
     parameter3 = 0.1;
     parameter4 = 0.1;
     parameter5 = 0.1;
-    use_multi = false;
+    use_multi  = false;
 
 }
 
@@ -190,8 +194,7 @@ void Filters::do_LIORfilter()
         for (auto &point : *inputCloud)
         {
             double intensity_trehshold=parameter4;
-            float distance = sqrt(pow(point.x, 2) + pow(point.y, 2)+pow(point.z, 2));
-            if(point._PointXYZI::intensity*distance*LIOR_CONST > intensity_trehshold)
+            if(point._PointXYZI::intensity > intensity_trehshold)
             {
                 mutex.lock();
                 inliners.push_back(point);
@@ -236,8 +239,7 @@ void Filters::do_DLIORfilter()
         for (auto &point : *inputCloud)
         {
             double intensity_trehshold=parameter4;
-            float distance = sqrt(pow(point.x, 2) + pow(point.y, 2));
-            if(point._PointXYZI::intensity*distance*LIOR_CONST > intensity_trehshold)
+            if(point._PointXYZI::intensity > intensity_trehshold)
             {
                 mutex.lock();
                 inliners.push_back(point);
@@ -414,6 +416,37 @@ void Filters::update_filterSettings(const alfa_dvc::FilterSettings &msg)
     parameter3 = msg.parameter3;
     parameter4 = msg.parameter4;
     parameter5 = msg.parameter5;
+
+    switch (filter_number) {
+    case 1:
+        cout << "Updated to voxel Filter";
+        break;
+    case 2:
+        cout << "Updated to ROR Filter";
+        break;
+    case 3:
+        cout << "Updated to SOR Filter";
+        break;
+    case 4:
+        cout << "Updated to DROR Filter";
+        break;
+    case 5:
+        cout << "Updated to FCSOR Filter";
+        break;
+    case 6:
+        cout << "Updated to VDROR Filter";
+        break;
+    case 7:
+        cout << "Updated to GDROR Filter";
+        break;
+    case 8:
+        cout << "Updated to LIOR Filter";
+        break;
+    case 9:
+        cout << "Updated to DLIOR Filter";
+        break;
+    }
+    cout<< " with parameters: 1:"<<msg.parameter1<<"; 2:"<<msg.parameter2<<"; 3:"<<msg.parameter3<<"; 4:"<<msg.parameter4<<"; 5:"<<msg.parameter5<<endl;
     mutex.unlock();
     if (thread_list.size()>0)
     {
@@ -422,6 +455,7 @@ void Filters::update_filterSettings(const alfa_dvc::FilterSettings &msg)
             thread_list[i]->join();
         }
     }
+
     //thread_list.clear();
     mutex.lock();
     if(filter_number == 4)
