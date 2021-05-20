@@ -1,4 +1,5 @@
 #include "rosthread.h"
+#include <thread>
 
 
 
@@ -57,7 +58,8 @@ void RosThread::subscrive_topics()
 
 void RosThread::spin()
 {
-    std::cout << "Started Spinning." << std::endl;
-    ros::MultiThreadedSpinner spinner(4);
+    int threads = std::thread::hardware_concurrency();
+    std::cout << "Started Spinning with processor_count threads"<<threads << std::endl;
+    ros::MultiThreadedSpinner spinner(threads);
     spinner.spin();
 }
