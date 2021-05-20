@@ -342,12 +342,13 @@ void Filters::filter_point(pcl::PointXYZI point,bool isDLIOR)
     //anlge = 2*M_PI + anlge;
     //}
     //float anlge = parameter4;
+    float anlge;
     if(isDLIOR)
     {
-        float anlge = 0.3;
+       anlge = 0.3;
     }
     else {
-        float anlge = parameter4;
+       anlge = parameter4;
     }
 
     if(distance<parameter1)
