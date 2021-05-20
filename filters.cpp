@@ -54,7 +54,15 @@ void Filters::do_dorfilter(pcl::PointCloud<PointT>::Ptr newInput)
 
     inliners.clear();
     kdtree.setInputCloud(newInput);
+    if(thread_list.size()>1)
+    {
+        for (int i =0;i < thread_list.size();i++)
+        {
+            thread_list[i]->join();
+         }
 
+        thread_list.clear();
+    }
     if(use_multi == true)
     {
         thread_list.clear();
@@ -136,7 +144,15 @@ void Filters::do_GDRORfilter()
     //vector<pcl::PointXYZI> inliners;
     inliners.clear();
     kdtree.setInputCloud(inputCloud);
+    if(thread_list.size()>1)
+    {
+        for (int i =0;i < thread_list.size();i++)
+        {
+            thread_list[i]->join();
+         }
 
+        thread_list.clear();
+    }
     if(use_multi)
     {
         thread_list.clear();
@@ -527,7 +543,7 @@ void Filters::run_lior_worker(int thread_number)
         pcl::PointXYZI point = (*inputCloud)[i];
         double intensity_trehshold=parameter2;
         float distance = sqrt(pow(point.x, 2) + pow(point.y, 2)+pow(point.z, 2));
-        if(point._PointXYZI::intensity*distance*LIOR_CONST > intensity_trehshold)
+        if(point._PointXYZI::intensity > intensity_trehshold)
         {
             mutex.lock();
             inliners.push_back(point);
@@ -548,8 +564,7 @@ void Filters::run_dlior_worker(int thread_number)
     {
         pcl::PointXYZI point = (*inputCloud)[i];
         double intensity_trehshold=parameter4;
-        float distance = sqrt(pow(point.x, 2) + pow(point.y, 2)+pow(point.z, 2));
-        if(point._PointXYZI::intensity*distance*LIOR_CONST > intensity_trehshold)
+        if(point._PointXYZI::intensity > intensity_trehshold)
         {
             mutex.lock();
             inliners.push_back(point);
@@ -557,7 +572,7 @@ void Filters::run_dlior_worker(int thread_number)
         }
         else
         {
-            filter_point(point);
+            filter_point(point,1);
         }
     }
 
