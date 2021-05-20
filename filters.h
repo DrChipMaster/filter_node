@@ -68,7 +68,7 @@ private:
     void run_worker(int thread_number);
     void run_lior_worker(int thread_number);
     void run_dlior_worker(int thread_number);
-    void filter_point(pcl::PointXYZI point);
+    void filter_point(pcl::PointXYZI point,bool isDLIOR=0);
     void filter_pointGDROR(pcl::PointXYZI point);
     void filter_pointROR(pcl::PointXYZI point);
      void cloud_cb (const  sensor_msgs::PointCloud2ConstPtr& cloud);

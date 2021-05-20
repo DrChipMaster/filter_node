@@ -178,9 +178,14 @@ void Filters::do_LIORfilter()
     inliners.clear();
     kdtree.setInputCloud(inputCloud);
     number_threads = parameter4;
+    for (int i =0;i <= thread_list.size();i++)
+    {
+        thread_list[i]->join();
+     }
+
+    thread_list.clear();
     if (number_threads >1)
     {
-        thread_list.clear();
         for (int i =0;i <= number_threads;i++)
         {
             thread_list.push_back(new boost::thread(&Filters::run_lior_worker, this,i));
@@ -193,7 +198,7 @@ void Filters::do_LIORfilter()
     else {
         for (auto &point : *inputCloud)
         {
-            double intensity_trehshold=parameter4;
+            double intensity_trehshold=parameter2;
             if(point._PointXYZI::intensity > intensity_trehshold)
             {
                 mutex.lock();
@@ -223,6 +228,12 @@ void Filters::do_DLIORfilter()
     inliners.clear();
     kdtree.setInputCloud(inputCloud);
     number_threads = parameter5;
+    for (int i =0;i <= thread_list.size();i++)
+    {
+        thread_list[i]->join();
+     }
+
+    thread_list.clear();
     if (number_threads >1)
     {
         thread_list.clear();
@@ -247,7 +258,7 @@ void Filters::do_DLIORfilter()
             }
             else
             {
-                filter_point(point);
+                filter_point(point,1);
             }
         }
 
@@ -321,7 +332,7 @@ void Filters::filter_pointROR(pcl::PointXYZI point)
 
 
 
-void Filters::filter_point(pcl::PointXYZI point)
+void Filters::filter_point(pcl::PointXYZI point,bool isDLIOR)
 {
     float distance = sqrt(pow(point.x,2)+pow(point.y,2));
     float search_radius;
@@ -330,7 +341,14 @@ void Filters::filter_point(pcl::PointXYZI point)
     //{
     //anlge = 2*M_PI + anlge;
     //}
-    float anlge = parameter4;
+    //float anlge = parameter4;
+    if(isDLIOR)
+    {
+        float anlge = 0.3;
+    }
+    else {
+        float anlge = parameter4;
+    }
 
     if(distance<parameter1)
     {
