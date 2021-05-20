@@ -178,7 +178,7 @@ void Filters::do_LIORfilter()
     inliners.clear();
     kdtree.setInputCloud(inputCloud);
     number_threads = parameter4;
-    if (use_multi && number_threads >1)
+    if (number_threads >1)
     {
         thread_list.clear();
         for (int i =0;i <= number_threads;i++)
@@ -223,7 +223,7 @@ void Filters::do_DLIORfilter()
     inliners.clear();
     kdtree.setInputCloud(inputCloud);
     number_threads = parameter5;
-    if (use_multi && number_threads >1)
+    if (number_threads >1)
     {
         thread_list.clear();
         for (int i =0;i <= number_threads;i++)
