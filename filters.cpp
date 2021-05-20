@@ -408,7 +408,7 @@ void Filters::filter_pointGDROR(pcl::PointXYZI point)
 
 void Filters::update_filterSettings(const alfa_dvc::FilterSettings &msg)
 {
-    cout<<"updating filter Settings"<<endl;
+    cout<<"updating filter Settings to "<<msg.filterNumber<<endl;
     mutex.lock();
     filter_number = msg.filterNumber;
     parameter1 = msg.parameter1;
@@ -416,6 +416,7 @@ void Filters::update_filterSettings(const alfa_dvc::FilterSettings &msg)
     parameter3 = msg.parameter3;
     parameter4 = msg.parameter4;
     parameter5 = msg.parameter5;
+    mutex.unlock();
 
     switch (filter_number) {
     case 1:
@@ -447,7 +448,6 @@ void Filters::update_filterSettings(const alfa_dvc::FilterSettings &msg)
         break;
     }
     cout<< " with parameters: 1:"<<msg.parameter1<<"; 2:"<<msg.parameter2<<"; 3:"<<msg.parameter3<<"; 4:"<<msg.parameter4<<"; 5:"<<msg.parameter5<<endl;
-    mutex.unlock();
     if (thread_list.size()>0)
     {
         for (int i =0;i <= number_threads;i++)
