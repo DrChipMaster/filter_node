@@ -18,7 +18,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 
-
+typedef long long int u64;
 typedef pcl::PointXYZI PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 
@@ -39,6 +39,9 @@ public:
     void do_DLIORfilter();
     void apply_filters();
     void update_filterSettings(const alfa_dvc::FilterSettings &msg);
+    void do_hardwarefilter();
+
+
     pcl::PointCloud<PointT>::Ptr inputCloud;
     pcl::PointCloud<PointT>::Ptr OutputCloud;
 
@@ -50,6 +53,7 @@ private:
     float parameter4;
     float parameter5;
     bool use_multi;
+    bool hardware_ready;
 
     boost::thread *m_worker_thread1;
     boost::thread *m_worker_thread2;
@@ -72,12 +76,25 @@ private:
     void filter_pointGDROR(pcl::PointXYZI point);
     void filter_pointROR(pcl::PointXYZI point);
      void cloud_cb (const  sensor_msgs::PointCloud2ConstPtr& cloud);
+     void decode_pointcloud();
+
      void emit_frametime();
      void emit_exitpointcloud();
 
     ros::Publisher filter_metrics;
      ros::Publisher filter_pcloud;
      int pcl2_Header_seq;
+
+
+
+     //Hardware parameters:
+     unsigned int bram_size = 0x40000;
+     off_t bram_x = 0xA0000000; // physical base address
+     off_t bram_y = 0xA0040000; // physical base address
+     off_t bram_z = 0xA0080000; // physical base address
+     u64 *bram_x_ptr;
+     u64 *bram_y_ptr;
+     u64 *bram_z_ptr;
 };
 
 #endif // FILTERS_H

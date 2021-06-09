@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.9.2, 2021-05-20T15:09:41. -->
+<!-- Written by QtCreator 4.9.2, 2021-05-20T18:59:57. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -76,7 +76,6 @@
      <value type="QString">CMAKE_CXX_COMPILER:STRING=%{Compiler:Executable:Cxx}</value>
      <value type="QString">CMAKE_C_COMPILER:STRING=%{Compiler:Executable:C}</value>
      <value type="QString">unset CMAKE_INSTALL_PREFIX</value>
-     <value type="QString">unset CMAKE_PREFIX_PATH</value>
      <value type="QString">QT_QMAKE_EXECUTABLE:STRING=%{Qt:qmakeExecutable}</value>
     </valuelist>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/andre/catkin_ws/src/build-filter_node-Desktop-Default</value>
@@ -374,7 +373,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/tmp/QtCreator-BbARzf/qtc-cmake-KBBcfbMM/devel/lib/filter_node</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/andre/catkin_ws/src/build-filter_node-Desktop-Default/devel/lib/filter_node</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

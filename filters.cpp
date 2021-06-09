@@ -27,6 +27,15 @@ Filters::Filters()
     parameter4 = 0.1;
     parameter5 = 0.1;
     use_multi  = false;
+    hardware_ready = 0;
+        int fd;
+        if ((fd = open("/dev/mem", O_RDWR | O_SYNC)) != -1) {
+            bram_x_ptr = (u64 *)mmap(NULL, bram_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, bram_x);
+            bram_y_ptr = (u64 *)mmap(NULL, bram_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, bram_y);
+            bram_z_ptr = (u64 *)mmap(NULL, bram_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, bram_z);
+            hardware_ready=1;
+        }
+
 
 }
 
@@ -299,6 +308,63 @@ void Filters::do_DLIORfilter()
 
 }
 
+
+
+void Filters::do_hardwarefilter()
+{
+    long long int a_32points_x=0;
+    long long int a_32points_y=0;
+    long long int a_32points_z=0;
+    int32_t a_64points[2];
+    bram_x_ptr[0]= inputCloud->size();
+    int i =0;
+    int pos_aux=0;
+    int bram_aux=1;
+    for (auto &point : *inputCloud)
+    {
+        if ( i == 0)
+        {
+            a_32points_x = (int16_t)(point.x*100);
+            a_32points_y = (int16_t)(point.y*100);
+            a_32points_z = (int16_t)(point.z*100);
+            i++;
+
+        }
+        else {
+            a_32points_x = a_32points_x +((int16_t)(point.x*100)<<(16*i));
+            a_32points_y = a_32points_y +((int16_t)(point.y*100)<<(16*i));
+            a_32points_z = a_32points_z +((int16_t)(point.z*100)<<(16*i));
+            i=0;
+            a_64points[pos_aux]=a_32points_x;
+            pos_aux++;
+
+            if(pos_aux==2)
+            {
+                memcpy((void*)(bram_x_ptr+bram_aux),a_64points,sizeof(int32_t)*2);
+                cout << "sended to mem"<<bram_aux<<endl;
+                bram_aux++;
+                pos_aux=0;
+
+            }
+        }
+    }
+    bram_y_ptr[0]=1;
+    cout <<"sended start signal"<<endl;
+
+    while (bram_z_ptr[0]==0) {
+
+    }
+    cout<<"received finish signal"<<endl;
+    decode_pointcloud();
+
+
+
+
+
+
+}
+
+
 using namespace std::chrono;
 void Filters::apply_filters()
 {
@@ -321,7 +387,7 @@ void Filters::apply_filters()
         do_fcsorfilter();
         break;
     case 6:
-        do_VoxDrorfilter();
+        do_hardwarefilter();
         break;
     case 7:
         do_GDRORfilter();
@@ -338,6 +404,62 @@ void Filters::apply_filters()
     frameTime = duration.count();
     emit_frametime();
     emit_exitpointcloud();
+
+}
+
+
+void Filters::decode_pointcloud()
+{
+    OutputCloud->clear();
+    for (int i = 1; i < inputCloud->size()/4; ++i) {
+        stringstream s_4_point_x,s_4_point_y,s_4_point_z;
+        s_4_point_x<<hex<<bram_x_ptr[i];
+        s_4_point_y<<hex<<bram_y_ptr[i];
+        s_4_point_z<<hex<<bram_z_ptr[i];
+        string base_x=s_4_point_x.str();
+        string base_y=s_4_point_y.str();
+        string base_z=s_4_point_z.str();
+
+
+
+        string sx;
+        string sy;
+        string sz;
+
+
+        for (int j = 0; j < 4; ++j) {
+            sx=base_x.substr(j*4,(j+1)*4);
+            sy=base_y.substr(j*4,(j+1)*4);
+            sz=base_z.substr(j*4,(j+1)*4);
+            long x = 0,y=0,z=0;
+            x =  std::stoul(sx, nullptr, 16);
+            y =  std::stoul(sy, nullptr, 16);
+            z =  std::stoul(sz, nullptr, 16);
+
+            if((sx.at(0)=='f' || sx.at(0)=='e') && sx.size()==4)
+                {
+                  x = x-65535;
+                }
+                if((sy.at(0)=='f'|| sy.at(0)=='e') && sy.size()==4)
+                {
+                  y = y-65535;
+                }
+                if((sz.at(0)=='f'|| sz.at(0)=='e')&&sz.size()==4)
+                {
+                  z = z-65535;
+                }
+
+            pcl::PointXYZI point;
+            point.x = x/100.0;
+            point.y= y/100.0;
+            point.z= z/100.0;
+            if(point.x!=0 && point.z!=0 && point.y!=0)
+                OutputCloud->push_back(point);
+
+        }
+
+
+    }
 
 }
 
