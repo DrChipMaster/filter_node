@@ -90,8 +90,8 @@ private:
      //Hardware parameters:
      unsigned int bram_size = 0x40000;
      off_t bram_x = 0xA0000000; // physical base address
-     off_t bram_y = 0xA0040000; // physical base address
-     off_t bram_z = 0xA0080000; // physical base address
+     off_t bram_y = 0xA2000000; // physical base address
+     off_t bram_z = 0xA1080000; // physical base address
      u64 *bram_x_ptr;
      u64 *bram_y_ptr;
      u64 *bram_z_ptr;

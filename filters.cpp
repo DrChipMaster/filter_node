@@ -315,7 +315,10 @@ void Filters::do_hardwarefilter()
     long long int a_32points_x=0;
     long long int a_32points_y=0;
     long long int a_32points_z=0;
-    int32_t a_64points[2];
+    int32_t a_64points_x[2];
+    int32_t a_64points_y[2];
+    int32_t a_64points_z[2];
+
     bram_x_ptr[0]= inputCloud->size();
     int i =0;
     int pos_aux=0;
@@ -335,12 +338,19 @@ void Filters::do_hardwarefilter()
             a_32points_y = a_32points_y +((int16_t)(point.y*100)<<(16*i));
             a_32points_z = a_32points_z +((int16_t)(point.z*100)<<(16*i));
             i=0;
-            a_64points[pos_aux]=a_32points_x;
+            a_64points_x[pos_aux]=a_32points_x;
+            a_64points_y[pos_aux]=a_32points_x;
+            a_64points_z[pos_aux]=a_32points_x;
+
+
             pos_aux++;
 
             if(pos_aux==2)
             {
-                memcpy((void*)(bram_x_ptr+bram_aux),a_64points,sizeof(int32_t)*2);
+                memcpy((void*)(bram_x_ptr+bram_aux),a_64points_x,sizeof(int32_t)*2);
+                memcpy((void*)(bram_y_ptr+bram_aux),a_64points_y,sizeof(int32_t)*2);
+                memcpy((void*)(bram_z_ptr+bram_aux),a_64points_z,sizeof(int32_t)*2);
+
                 cout << "sended to mem"<<bram_aux<<endl;
                 bram_aux++;
                 pos_aux=0;
@@ -348,6 +358,7 @@ void Filters::do_hardwarefilter()
             }
         }
     }
+    cout << "points saved"<<endl;
     bram_y_ptr[0]=1;
     cout <<"sended start signal"<<endl;
 
