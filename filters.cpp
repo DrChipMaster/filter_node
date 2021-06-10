@@ -359,7 +359,7 @@ void Filters::do_hardwarefilter()
         }
     }
     cout << "points saved"<<endl;
-    bram_y_ptr[0]=1;
+    bram_y_ptr[0]=0xffff;
     cout <<"sended start signal"<<endl;
 
     while (bram_z_ptr[0]==0) {
