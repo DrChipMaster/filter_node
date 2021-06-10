@@ -351,7 +351,7 @@ void Filters::do_hardwarefilter()
                 memcpy((void*)(bram_y_ptr+bram_aux),a_64points_y,sizeof(int32_t)*2);
                 memcpy((void*)(bram_z_ptr+bram_aux),a_64points_z,sizeof(int32_t)*2);
 
-                cout << "sended to mem"<<bram_aux<<endl;
+                //cout << "sended to mem"<<bram_aux<<endl;
                 bram_aux++;
                 pos_aux=0;
 
