@@ -363,7 +363,6 @@ void Filters::do_hardwarefilter()
     cout <<"sended start signal"<<endl;
 
     while (bram_z_ptr[0]==0) {
-
     }
     cout<<"received finish signal"<<endl;
     decode_pointcloud();
@@ -436,7 +435,7 @@ void Filters::decode_pointcloud()
         string sx;
         string sy;
         string sz;
-
+        cout<< "receibed x_string "<<base_x<< "receibed y_string "<<base_y<<"receibed z_string "<<base_z<<endl;
 
         for (int j = 0; j < 4; ++j) {
             sx=base_x.substr(j*4,(j+1)*4);
