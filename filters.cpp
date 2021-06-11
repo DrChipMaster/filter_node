@@ -460,7 +460,7 @@ void Filters::decode_pointcloud()
 
 
 
-                cout << " Not error sx: "<<sx<<"sy: "<<sy<<"sz: "<<sz<<endl;
+                //cout << " Not error sx: "<<sx<<"sy: "<<sy<<"sz: "<<sz<<endl;
 
 
                 long x = 0,y=0,z=0;
@@ -489,7 +489,8 @@ void Filters::decode_pointcloud()
                 OutputCloud->push_back(point);
 
             } catch (...) {
-                cout << "sx: "<<sx<<"sy: "<<sy<<"sz: "<<sz<<endl;
+                cout << "S values sx: "<<sx<<" sy: "<<sy<<" sz: "<<sz<<endl;
+                cout <<"Base values: Base x: "<<base_x<<" Base_y: "<<base_y<<" Base_z: "<<base_z<<endl;
             }
 
         }
