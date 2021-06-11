@@ -444,43 +444,50 @@ void Filters::decode_pointcloud()
 
         for (int j = 0; j < 4; j++) {
             cout<<"entrei aqui"<<endl;
-            if(j==3)
-            {
-                sx=base_x.substr(j*4);
-                sy=base_y.substr(j*4);
-                sz=base_z.substr(j*4);
+            try {
+                if(j==3)
+                {
+                    sx=base_x.substr(j*4);
+                    sy=base_y.substr(j*4);
+                    sz=base_z.substr(j*4);
+                }
+                else
+                {
+                    sx=base_x.substr(j*4,(j+1)*4);
+                    sy=base_y.substr(j*4,(j+1)*4);
+                    sz=base_z.substr(j*4,(j+1)*4);
+                }
+                cout << " Not error sx: "<<sx<<"sy: "<<sy<<"sz: "<<sz<<endl;
+
+
+                long x = 0,y=0,z=0;
+                x =  std::stoul(sx, nullptr, 16);
+                y =  std::stoul(sy, nullptr, 16);
+                z =  std::stoul(sz, nullptr, 16);
+
+                if((sx.at(0)=='f' || sx.at(0)=='e') && sx.size()==4)
+                    {
+                      x = x-65535;
+                    }
+                    if((sy.at(0)=='f'|| sy.at(0)=='e') && sy.size()==4)
+                    {
+                      y = y-65535;
+                    }
+                    if((sz.at(0)=='f'|| sz.at(0)=='e')&&sz.size()==4)
+                    {
+                      z = z-65535;
+                    }
+
+                pcl::PointXYZI point;
+                point.x = x/100.0;
+                point.y= y/100.0;
+                point.z= z/100.0;
+                cout << "x: "<< point.x<<"y: "<<point.y<<"z: "<<point.z<<endl;
+                OutputCloud->push_back(point);
+
+            } catch (...) {
+                cout << "sx: "<<sx<<"sy: "<<sy<<"sz: "<<sz<<endl;
             }
-            else
-            {
-                sx=base_x.substr(j*4,(j+1)*4);
-                sy=base_y.substr(j*4,(j+1)*4);
-                sz=base_z.substr(j*4,(j+1)*4);
-            }
-
-            long x = 0,y=0,z=0;
-            x =  std::stoul(sx, nullptr, 16);
-            y =  std::stoul(sy, nullptr, 16);
-            z =  std::stoul(sz, nullptr, 16);
-
-            if((sx.at(0)=='f' || sx.at(0)=='e') && sx.size()==4)
-                {
-                  x = x-65535;
-                }
-                if((sy.at(0)=='f'|| sy.at(0)=='e') && sy.size()==4)
-                {
-                  y = y-65535;
-                }
-                if((sz.at(0)=='f'|| sz.at(0)=='e')&&sz.size()==4)
-                {
-                  z = z-65535;
-                }
-
-            pcl::PointXYZI point;
-            point.x = x/100.0;
-            point.y= y/100.0;
-            point.z= z/100.0;
-            cout << "x: "<< point.x<<"y: "<<point.y<<"z: "<<point.z<<endl;
-            OutputCloud->push_back(point);
 
         }
 
