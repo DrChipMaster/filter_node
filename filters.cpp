@@ -440,7 +440,7 @@ void Filters::decode_pointcloud()
         string sx;
         string sy;
         string sz;
-        cout<< "receibed x_string "<<base_x<< "receibed y_string "<<base_y<<"receibed z_string "<<base_z<<endl;
+        //cout<< "receibed x_string "<<base_x<< "receibed y_string "<<base_y<<"receibed z_string "<<base_z<<endl;
         if(std::stoul(base_x, nullptr, 64)!=0)
         {
         for (int j = 0; j < 4; ++j) {
@@ -469,14 +469,16 @@ void Filters::decode_pointcloud()
             point.x = x/100.0;
             point.y= y/100.0;
             point.z= z/100.0;
-            if(point.x!=0 && point.z!=0 && point.y!=0)
-                OutputCloud->push_back(point);
+            cout << "x: "<< point.x<<"y: "<<point.y<<"z: "<<point.z<<endl;
+            OutputCloud->push_back(point);
 
-        }
-        }
+        }        }
 
 
     }
+    cout <<"end filter"<<endl;
+    pcl::io::savePCDFileASCII("plswork.pcd", *OutputCloud);
+
 
 }
 
