@@ -441,7 +441,8 @@ void Filters::decode_pointcloud()
         string sy;
         string sz;
         cout<< "receibed x_string "<<base_x<< "receibed y_string "<<base_y<<"receibed z_string "<<base_z<<endl;
-
+        if(std::stoul(base_x, nullptr, 64)!=0)
+        {
         for (int j = 0; j < 4; ++j) {
             sx=base_x.substr(j*4,(j+1)*4);
             sy=base_y.substr(j*4,(j+1)*4);
@@ -471,6 +472,7 @@ void Filters::decode_pointcloud()
             if(point.x!=0 && point.z!=0 && point.y!=0)
                 OutputCloud->push_back(point);
 
+        }
         }
 
 
