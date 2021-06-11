@@ -441,13 +441,22 @@ void Filters::decode_pointcloud()
         string sy;
         string sz;
         //cout<< "receibed x_string "<<base_x<< "receibed y_string "<<base_y<<"receibed z_string "<<base_z<<endl;
-        if(std::stoul(base_x, nullptr, 64)!=0)
-        {
+
         for (int j = 0; j < 4; j++) {
             cout<<"entrei aqui"<<endl;
-            sx=base_x.substr(j*4,(j+1)*4);
-            sy=base_y.substr(j*4,(j+1)*4);
-            sz=base_z.substr(j*4,(j+1)*4);
+            if(j==3)
+            {
+                sx=base_x.substr(j*4);
+                sy=base_y.substr(j*4);
+                sz=base_z.substr(j*4);
+            }
+            else
+            {
+                sx=base_x.substr(j*4,(j+1)*4);
+                sy=base_y.substr(j*4,(j+1)*4);
+                sz=base_z.substr(j*4,(j+1)*4);
+            }
+
             long x = 0,y=0,z=0;
             x =  std::stoul(sx, nullptr, 16);
             y =  std::stoul(sy, nullptr, 16);
@@ -473,7 +482,7 @@ void Filters::decode_pointcloud()
             cout << "x: "<< point.x<<"y: "<<point.y<<"z: "<<point.z<<endl;
             OutputCloud->push_back(point);
 
-        }        }
+        }
 
 
     }
