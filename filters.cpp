@@ -453,10 +453,13 @@ void Filters::decode_pointcloud()
                 }
                 else
                 {
-                    sx=base_x.substr(j*4,(j+1)*4);
-                    sy=base_y.substr(j*4,(j+1)*4);
-                    sz=base_z.substr(j*4,(j+1)*4);
+                    sx=base_x.substr(j*4,((j+1)*4)-1);
+                    sy=base_y.substr(j*4,((j+1)*4)-1);
+                    sz=base_z.substr(j*4,((j+1)*4)-1);
                 }
+
+
+
                 cout << " Not error sx: "<<sx<<"sy: "<<sy<<"sz: "<<sz<<endl;
 
 
