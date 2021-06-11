@@ -443,7 +443,8 @@ void Filters::decode_pointcloud()
         //cout<< "receibed x_string "<<base_x<< "receibed y_string "<<base_y<<"receibed z_string "<<base_z<<endl;
         if(std::stoul(base_x, nullptr, 64)!=0)
         {
-        for (int j = 0; j < 4; ++j) {
+        for (int j = 0; j < 4; j++) {
+            cout<<"entrei aqui"<<endl;
             sx=base_x.substr(j*4,(j+1)*4);
             sy=base_y.substr(j*4,(j+1)*4);
             sz=base_z.substr(j*4,(j+1)*4);
@@ -476,7 +477,7 @@ void Filters::decode_pointcloud()
 
 
     }
-    cout <<"end filter"<<endl;
+    cout <<"end filter with point cloud size: "<<OutputCloud->size()<<endl;
     pcl::io::savePCDFileASCII("plswork.pcd", *OutputCloud);
 
 
