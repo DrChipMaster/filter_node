@@ -443,7 +443,7 @@ void Filters::decode_pointcloud()
         //cout<< "receibed x_string "<<base_x<< "receibed y_string "<<base_y<<"receibed z_string "<<base_z<<endl;
 
         for (int j = 0; j < 4; j++) {
-            cout<<"entrei aqui"<<endl;
+            //cout<<"entrei aqui"<<endl;
             try {
                 if(j==3)
                 {
@@ -460,7 +460,7 @@ void Filters::decode_pointcloud()
 
 
 
-                //cout << " Not error sx: "<<sx<<"sy: "<<sy<<"sz: "<<sz<<endl;
+                cout << " Not error sx: "<<sx<<"sy: "<<sy<<"sz: "<<sz<<endl;
 
 
                 long x = 0,y=0,z=0;
@@ -468,18 +468,18 @@ void Filters::decode_pointcloud()
                 y =  std::stoul(sy, nullptr, 16);
                 z =  std::stoul(sz, nullptr, 16);
 
-                if((sx.at(0)=='f' || sx.at(0)=='e') && sx.size()==4)
-                    {
-                      x = x-65535;
-                    }
-                    if((sy.at(0)=='f'|| sy.at(0)=='e') && sy.size()==4)
-                    {
-                      y = y-65535;
-                    }
-                    if((sz.at(0)=='f'|| sz.at(0)=='e')&&sz.size()==4)
-                    {
-                      z = z-65535;
-                    }
+//                if((sx.at(0)=='f' || sx.at(0)=='e') && sx.size()==4)
+//                    {
+//                      x = x-65535;
+//                    }
+//                    if((sy.at(0)=='f'|| sy.at(0)=='e') && sy.size()==4)
+//                    {
+//                      y = y-65535;
+//                    }
+//                    if((sz.at(0)=='f'|| sz.at(0)=='e')&&sz.size()==4)
+//                    {
+//                      z = z-65535;
+//                    }
 
                 pcl::PointXYZI point;
                 point.x = x/100.0;
