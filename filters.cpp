@@ -444,8 +444,9 @@ void Filters::decode_pointcloud()
             point.x = point_x[j]/100.0;
             point.y= point_y[j]/100.0;
             point.z= point_z[j]/100.0;
-            cout << "x: "<< point.x<<"y: "<<point.y<<"z: "<<point.z<<endl;
-            OutputCloud->push_back(point);
+            //cout << "x: "<< point.x<<"y: "<<point.y<<"z: "<<point.z<<endl;
+            if(point.x!=0 )
+                 OutputCloud->push_back(point);
         }
 
 
