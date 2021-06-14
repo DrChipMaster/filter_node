@@ -339,8 +339,8 @@ void Filters::do_hardwarefilter()
             a_32points_z = a_32points_z +((int16_t)(point.z*100)<<(16*i));
             i=0;
             a_64points_x[pos_aux]=a_32points_x;
-            a_64points_y[pos_aux]=a_32points_x;
-            a_64points_z[pos_aux]=a_32points_x;
+            a_64points_y[pos_aux]=a_32points_y;
+            a_64points_z[pos_aux]=a_32points_z;
 
 
             pos_aux++;
