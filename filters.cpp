@@ -358,18 +358,19 @@ void Filters::do_hardwarefilter()
             }
         }
     }
-    cout << "points saved"<<endl;
+    //cout << "points saved"<<endl;
     bram_y_ptr[0]=0xffff;
-    cout <<"sended start signal"<<endl;
+    //cout <<"sended start signal"<<endl;
     int hardware_finish =1;
     while (hardware_finish) {
         int value = bram_z_ptr[0];
         if(value >=1)
             hardware_finish=0;
         else
-             sleep(1);
+             usleep(1);
     }
-    cout<<"received finish signal"<<endl;
+    bram_z_ptr[0]=0;
+    //cout<<"received finish signal"<<endl;
     decode_pointcloud();
 
 
