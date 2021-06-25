@@ -446,14 +446,14 @@ void Filters::decode_pointcloud()
             point.y= point_y[j]/100.0;
             point.z= point_z[j]/100.0;
             //cout << "x: "<< point.x<<"y: "<<point.y<<"z: "<<point.z<<endl;
-            //if(point.x!=0 )
+            if(point.x!=0 )
                  OutputCloud->push_back(point);
         }
 
 
     }
-    cout <<"end filter with point cloud size: "<<OutputCloud->size()<<endl;
-    pcl::io::savePCDFileASCII("plswork.pcd", *OutputCloud);
+    //cout <<"end filter with point cloud size: "<<OutputCloud->size()<<endl;
+    //pcl::io::savePCDFileASCII("plswork.pcd", *OutputCloud);
 
 
 }
