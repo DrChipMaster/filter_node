@@ -427,6 +427,9 @@ void Filters::apply_filters()
     case 9:
         do_DLIORfilter();
         break;
+    case 10:
+        do_hardwarefilter();
+        break;
     }
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
