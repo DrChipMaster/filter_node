@@ -18,7 +18,7 @@ void RosThread::cloud_cb(const sensor_msgs::PointCloud2ConstPtr &cloud)
         cout <<"Recieved empty point cloud"<<endl;
         return;
     }
-
+    cout<<"Recieved cloud"<<endl;
     pcl::fromROSMsg(*cloud,*pcloud);
     mFilters->apply_filters();
 
@@ -48,8 +48,8 @@ void RosThread::init()
 
 void RosThread::subscrive_topics()
 {
-    sub_cloud = nh.subscribe("alfa_pointcloud",2,&RosThread::cloud_cb,this);
-    sub_parameters = nh.subscribe("alfa_filter_settings",2,&RosThread::parameters_cb,this);
+    sub_cloud = nh.subscribe("alfa_pointcloud",0,&RosThread::cloud_cb,this);
+    sub_parameters = nh.subscribe("alfa_filter_settings",0,&RosThread::parameters_cb,this);
 
     m_spin_thread = new boost::thread(&RosThread::spin, this);
 
@@ -60,6 +60,7 @@ void RosThread::spin()
 {
     int threads = std::thread::hardware_concurrency();
     std::cout << "Started Spinning with processor_count threads"<<threads << std::endl;
-    ros::MultiThreadedSpinner spinner(threads);
-    spinner.spin();
+    //ros::MultiThreadedSpinner spinner(threads);
+    //spinner.spin();
+    ros::spin();
 }
