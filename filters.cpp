@@ -21,7 +21,7 @@ Filters::Filters()
 {
     pcl2_Header_seq=0;
     filter_number = 1;
-    parameter1 = 0.1;
+    parameter1 = 0;
     parameter2 = 0.1;
     parameter3 = 0.1;
     parameter4 = 0.1;
@@ -33,6 +33,8 @@ Filters::Filters()
             bram_x_ptr = (u64 *)mmap(NULL, bram_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, bram_x);
             bram_y_ptr = (u64 *)mmap(NULL, bram_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, bram_y);
             bram_z_ptr = (u64 *)mmap(NULL, bram_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, bram_z);
+            bram_i_ptr = (u64 *)mmap(NULL, bram_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, bram_i);
+
             hardware_ready=1;
         }
 
@@ -315,11 +317,15 @@ void Filters::do_hardwarefilter()
     long long int a_32points_x=0;
     long long int a_32points_y=0;
     long long int a_32points_z=0;
+    long long int a_32points_i=0;
     int32_t a_64points_x[2];
     int32_t a_64points_y[2];
     int32_t a_64points_z[2];
+    int32_t a_64points_i[2];
+
 
     bram_x_ptr[0]= inputCloud->size();
+    bram_i_ptr[0]= parameter1;
     int i =0;
     int pos_aux=0;
     int bram_aux=1;
@@ -330,6 +336,7 @@ void Filters::do_hardwarefilter()
             a_32points_x = (int16_t)(point.x*100);
             a_32points_y = (int16_t)(point.y*100);
             a_32points_z = (int16_t)(point.z*100);
+            a_32points_i = (int16_t)(point.intensity);
             i++;
 
         }
@@ -337,10 +344,13 @@ void Filters::do_hardwarefilter()
             a_32points_x = a_32points_x +((int16_t)(point.x*100)<<(16*i));
             a_32points_y = a_32points_y +((int16_t)(point.y*100)<<(16*i));
             a_32points_z = a_32points_z +((int16_t)(point.z*100)<<(16*i));
+            a_32points_i = a_32points_i +((int16_t)(point.intensity*100)<<(16*i));
+
             i=0;
             a_64points_x[pos_aux]=a_32points_x;
             a_64points_y[pos_aux]=a_32points_y;
             a_64points_z[pos_aux]=a_32points_z;
+            a_64points_i[pos_aux]=a_32points_i;
 
 
             pos_aux++;
@@ -350,6 +360,8 @@ void Filters::do_hardwarefilter()
                 memcpy((void*)(bram_x_ptr+bram_aux),a_64points_x,sizeof(int32_t)*2);
                 memcpy((void*)(bram_y_ptr+bram_aux),a_64points_y,sizeof(int32_t)*2);
                 memcpy((void*)(bram_z_ptr+bram_aux),a_64points_z,sizeof(int32_t)*2);
+                memcpy((void*)(bram_i_ptr+bram_aux),a_64points_i,sizeof(int32_t)*2);
+
 
                 //cout << "sended to mem"<<bram_aux<<endl;
                 bram_aux++;
@@ -360,6 +372,7 @@ void Filters::do_hardwarefilter()
     }
     //cout << "points saved"<<endl;
     bram_y_ptr[0]=0xffff;
+
     //cout <<"sended start signal"<<endl;
     int hardware_finish =1;
     while (hardware_finish) {
@@ -402,9 +415,9 @@ void Filters::apply_filters()
     case 5:
         do_fcsorfilter();
         break;
-    case 6:
-        do_hardwarefilter();
-        break;
+//    case 6:
+//        do_hardwarefilter();
+//        break;
     case 7:
         do_GDRORfilter();
         break;
@@ -430,12 +443,16 @@ void Filters::decode_pointcloud()
     int16_t point_x[4];
     int16_t point_y[4];
     int16_t point_z[4];
+    int16_t point_i[4];
+
     for (int i = 1; i < inputCloud->size()/4; ++i) {
 
 
         memcpy((void*)point_x,(bram_x_ptr+i),sizeof(int32_t)*2);
         memcpy((void*)point_y,(bram_y_ptr+i),sizeof(int32_t)*2);
         memcpy((void*)point_z,(bram_z_ptr+i),sizeof(int32_t)*2);
+        memcpy((void*)point_i,(bram_i_ptr+i),sizeof(int32_t)*2);
+
 
 
         for (int j = 0; j < 4; j++) {
@@ -445,6 +462,7 @@ void Filters::decode_pointcloud()
             point.x = point_x[j]/100.0;
             point.y= point_y[j]/100.0;
             point.z= point_z[j]/100.0;
+            point.intensity = point_i[j];
             //cout << "x: "<< point.x<<"y: "<<point.y<<"z: "<<point.z<<endl;
             if(point.x!=0 )
                  OutputCloud->push_back(point);
