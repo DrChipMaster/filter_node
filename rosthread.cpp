@@ -48,8 +48,8 @@ void RosThread::init()
 
 void RosThread::subscrive_topics()
 {
-    sub_cloud = nh.subscribe("alfa_pointcloud",0,&RosThread::cloud_cb,this);
-    sub_parameters = nh.subscribe("alfa_filter_settings",0,&RosThread::parameters_cb,this);
+    sub_cloud = nh.subscribe("alfa_pointcloud",2,&RosThread::cloud_cb,this);
+    sub_parameters = nh.subscribe("alfa_filter_settings",2,&RosThread::parameters_cb,this);
 
     m_spin_thread = new boost::thread(&RosThread::spin, this);
 
