@@ -310,7 +310,7 @@ void Filters::do_DLIORfilter()
 
 }
 
-
+using namespace std::chrono;
 
 void Filters::do_hardwarefilter()
 {
@@ -323,6 +323,7 @@ void Filters::do_hardwarefilter()
     int32_t a_64points_z[2];
     int32_t a_64points_i[2];
 
+    auto start = high_resolution_clock::now();
 
     bram_x_ptr[0]= inputCloud->size();
     bram_i_ptr[0]= parameter1;
@@ -372,7 +373,9 @@ void Filters::do_hardwarefilter()
     }
     //cout << "points saved"<<endl;
     bram_y_ptr[0]=0xffff;
-
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(stop - start);
+    frameTime = duration.count();
     //cout <<"sended start signal"<<endl;
     int hardware_finish =1;
     while (hardware_finish) {
@@ -384,20 +387,23 @@ void Filters::do_hardwarefilter()
     }
     bram_z_ptr[0]=0;
     //cout<<"received finish signal"<<endl;
+    auto start2 = high_resolution_clock::now();
+
     decode_pointcloud();
 
 
-
+    auto stop2 = high_resolution_clock::now();
+    auto duration2 = duration_cast<milliseconds>(stop - start);
+    frameTime += duration2.count();
 
 
 
 }
 
 
-using namespace std::chrono;
+
 void Filters::apply_filters()
 {
-    auto start = high_resolution_clock::now();
 
     switch (filter_number) {
     case 1:
@@ -431,9 +437,9 @@ void Filters::apply_filters()
         do_hardwarefilter();
         break;
     }
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<milliseconds>(stop - start);
-    frameTime = duration.count();
+    //auto stop = high_resolution_clock::now();
+    //auto duration = duration_cast<milliseconds>(stop - start);
+    //frameTime = duration.count();
     emit_frametime();
     emit_exitpointcloud();
 
